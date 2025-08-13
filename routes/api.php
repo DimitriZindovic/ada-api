@@ -5,7 +5,6 @@ use App\Http\Controllers\GroupController;
 use App\Http\Controllers\MessageController;
 use Illuminate\Support\Facades\Route;
 
-
 Route::prefix('auth')->group(function () {
     Route::post('/login', [AuthController::class, 'login']);
     Route::post('/register', [AuthController::class, 'register']);
