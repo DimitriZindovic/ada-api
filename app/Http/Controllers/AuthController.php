@@ -15,18 +15,14 @@ class AuthController extends Controller
         $request->validate([
             'phone' => 'sometimes|exists:users,phone|phone:INTERNATIONAL,FR',
             'email' => 'sometimes|exists:users,email|email',
-            'password' => [
-                'required',
-                'min:8',
-                'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*[\W_]).+$/'
-            ]
+            'password' => 'required|string|min:8',
         ]);
 
         $user = User::where('phone', $request->phone)
                     ->orWhere('email', $request->email)
                     ->first();
 
-        if (! $user || ! Hash::check($request->password, $user->password)) {
+        if (!$user || ! Hash::check($request->password, $user->password)) {
             return response()->json(['message' => 'The provided credentials are incorrect.'], Response::HTTP_UNAUTHORIZED);
         }
 
@@ -40,25 +36,24 @@ class AuthController extends Controller
     public function register(Request $request)
     {
         $validated = $request->validate([
-            'firstName' => 'required|string|max:255',
-            'lastName' => 'required|string|max:255',
             'username' => 'required|string|max:255|unique:users',
             'phone' => 'required|string|max:255|unique:users',
             'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:8|confirmed',
+            'password' => [
+                'required',
+                'string',
+                'min:8',
+                'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).+$/'
+            ],
+            'confirmPassword' => 'required|string|same:password',
         ]);
 
         $user = new User($validated);
         $user->password = Hash::make($request->password);
-        $user->first_name = $validated['firstName'];
-        $user->last_name = $validated['lastName'];
+
         $user->save();
 
-        $token = $user->createToken('api-token')->plainTextToken;
-
-        return response()->json([
-            'token' => $token,
-        ], 201);
+        return response()->json('',201);
     }
 
     public function logout(Request $request)

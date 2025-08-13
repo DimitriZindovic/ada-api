@@ -6,13 +6,10 @@ use Laravel\Sanctum\Sanctum;
 test('user can register', function () {
     $unique = uniqid();
     $userData = [
-        'firstName' => 'Alice',
-        'lastName' => 'Johnson',
         'username' => 'alicejohnson_' . $unique,
         'phone' => '+33555' . rand(100000, 999999),
         'email' => 'alice' . $unique . '@example.com',
         'password' => 'Password123!',
-        'password_confirmation' => 'Password123!',
     ];
 
     $response = $this->postJson('/api/register', $userData);
@@ -21,8 +18,6 @@ test('user can register', function () {
     $response->assertJsonStructure(['token']);
 
     $this->assertDatabaseHas('users', [
-        'first_name' => $userData['firstName'],
-        'last_name' => $userData['lastName'],
         'username' => $userData['username'],
         'phone' => $userData['phone'],
         'email' => $userData['email'],
