@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Models\Group;
+use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -29,43 +30,66 @@ class GroupController extends Controller
     public function store(Request $request): JsonResponse
     {
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'users' => 'required|array|min:1',
-            'users.*' => 'exists:users,id',
+            'name' => 'sometimes|string|max:255',
+            'phones' => 'sometimes|array|min:1',
+            'phones.*' => 'string|exists:users,phone',
+            'emails' => 'sometimes|array|min:1',
+            'emails.*' => 'string|email|exists:users,email',
         ]);
 
-        $userIds = collect($validated['users'])
-            ->push(auth()->id())
-            ->unique()
-            ->values();
+        $userIds = collect();
 
-        $group = new Group($validated);
+        if (!empty($validated['phones'])) {
+            $userIds = $userIds->merge(
+                User::whereIn('phone', $validated['phones'])->pluck('id')
+            );
+        }
+
+        if (!empty($validated['emails'])) {
+            $userIds = $userIds->merge(
+                User::whereIn('email', $validated['emails'])->pluck('id')
+            );
+        }
+
+        $userIds = $userIds->push(auth()->id())->unique()->values();
+
+        $group = new Group(['name' => $validated['name'] ?? null]);
         $group->save();
 
         $group->users()->attach(
             $userIds->mapWithKeys(fn($id) => [$id => ['joined_at' => now()]])
         );
 
-        return response()->json($group->load('users'), 201);
+        return response()->json($group, 201);
     }
 
     public function update(Request $request, Group $group): JsonResponse
     {
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'users' => 'sometimes|array|min:1',
-            'users.*' => 'exists:users,id',
+            'name' => 'sometimes|string|max:255',
+            'phones' => 'sometimes|array|min:1',
+            'phones.*' => 'string|exists:users,phone',
+            'emails' => 'sometimes|array|min:1',
+            'emails.*' => 'string|email|exists:users,email',
         ]);
 
-        $group->fill(['name' => $validated['name']]);
-        $group->save();
+        $userIds = collect();
 
-        if (isset($validated['users'])) {
-            $userIds = collect($validated['users'])
-                ->push(auth()->id())
-                ->unique()
-                ->values();
+        if (!empty($validated['phones'])) {
+            $userIds = $userIds->merge(
+                User::whereIn('phone', $validated['phones'])->pluck('id')
+            );
+        }
 
+        if (!empty($validated['emails'])) {
+            $userIds = $userIds->merge(
+                User::whereIn('email', $validated['emails'])->pluck('id')
+            );
+        }
+
+        $userIds = $userIds->push(auth()->id())->unique()->values();
+
+        if ($userIds->isNotEmpty()) {
             $syncData = $userIds->mapWithKeys(fn($id) => [$id => ['joined_at' => now()]]);
             $group->users()->sync($syncData);
         }
