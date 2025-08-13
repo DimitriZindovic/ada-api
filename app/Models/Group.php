@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use App\Http\Resources\Group as ResourcesGroup;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -10,7 +10,9 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Group extends Model
 {
-    use HasFactory, HasUuids;
+    use HasFactory;
+
+    const RESOURCE = ResourcesGroup::class;
 
     protected $fillable = [
         'name',
