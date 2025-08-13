@@ -51,14 +51,16 @@ class AuthController extends Controller
         $user = new User($validated);
         $user->password = Hash::make($request->password);
 
+        $token = $user->createToken('api-token')->plainTextToken;
+
         $user->save();
 
-        return response()->json('',201);
+        return response()->json(['token' => $token, 'user' => $user], 201);
     }
 
     public function logout(Request $request)
     {
-        $request->user()->currentAccessToken()->delete();
+        $request->user()->tokens()->delete();
 
         return response()->json();
     }
