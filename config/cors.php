@@ -21,7 +21,7 @@ return [
 
     'allowed_origins' => [
         'http://localhost:5173',
-        'https://ada-front-ten.vercel.app'
+        'https://ada-front-sb.vercel.app'
     ],
 
     'allowed_origins_patterns' => [],
