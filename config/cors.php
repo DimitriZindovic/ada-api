@@ -19,7 +19,7 @@ return [
 
     'allowed_methods' => ['*'],
 
-    'allowed_origins' => ['*'],
+    'allowed_origins' => ['https://ada-front-sb.vercel.app'],
 
     'allowed_origins_patterns' => [],
 
