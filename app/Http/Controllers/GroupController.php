@@ -60,7 +60,7 @@ class GroupController extends Controller
             $userIds->mapWithKeys(fn($id) => [$id => ['joined_at' => now()]])
         );
 
-        return response()->json($group, 201);
+        return response()->json('', 201);
     }
 
     public function update(Request $request, Group $group): JsonResponse
@@ -89,12 +89,15 @@ class GroupController extends Controller
 
         $userIds = $userIds->push(auth()->id())->unique()->values();
 
+        $group->fill($validated);
+        $group->save();
+
         if ($userIds->isNotEmpty()) {
             $syncData = $userIds->mapWithKeys(fn($id) => [$id => ['joined_at' => now()]]);
             $group->users()->sync($syncData);
         }
 
-        return response()->json($group, 200);
+        return response()->json('', 200);
     }
 
     public function leave(Request $request, Group $group): JsonResponse
