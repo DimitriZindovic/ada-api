@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('group_user', function (Blueprint $table) {
-            $table->uuid('id')->primary();
+            $table->id();
             $table->foreignId('group_id')->constrained('groups')->cascadeOnDelete()->cascadeOnUpdate();
             $table->foreignId('user_id')->constrained('users')->cascadeOnDelete()->cascadeOnUpdate();
             $table->timestamp('joined_at')->useCurrent();
