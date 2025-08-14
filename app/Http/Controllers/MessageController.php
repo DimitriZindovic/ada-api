@@ -31,6 +31,8 @@ class MessageController extends Controller
         $message->sender()->associate(auth()->user());
         $message->save();
 
+        $message->load(['sender', 'group']);
+
         broadcast(new MessageSent($message));
 
         return response()->json($message, 201);
