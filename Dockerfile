@@ -22,31 +22,7 @@ RUN composer install --no-dev --optimize-autoloader --no-interaction
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
 RUN chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
 
-RUN a2enmod rewrite headers
-
-# Configuration Apache pour gérer CORS et OPTIONS
-RUN echo '<VirtualHost *:80>\n\
-    DocumentRoot /var/www/html/public\n\
-    \n\
-    <Location "/">\n\
-        Header always set Access-Control-Allow-Origin "*"\n\
-        Header always set Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"\n\
-        Header always set Access-Control-Allow-Headers "Content-Type, Authorization, X-Requested-With"\n\
-        Header always set Access-Control-Max-Age "86400"\n\
-        \n\
-        RewriteEngine On\n\
-        RewriteCond %{REQUEST_METHOD} OPTIONS\n\
-        RewriteRule ^(.*)$ $1 [R=200,L]\n\
-    </Location>\n\
-    \n\
-    <Directory /var/www/html/public>\n\
-        AllowOverride All\n\
-        Require all granted\n\
-    </Directory>\n\
-    \n\
-    ErrorLog ${APACHE_LOG_DIR}/error.log\n\
-    CustomLog ${APACHE_LOG_DIR}/access.log combined\n\
-</VirtualHost>' > /etc/apache2/sites-available/000-default.conf
+RUN a2enmod rewrite
 
 RUN echo '#!/bin/bash\n\
 php artisan reverb:start --host=0.0.0.0 --port=8080 &\n\
