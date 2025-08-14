@@ -4,8 +4,8 @@ namespace App\Events;
 
 use App\Models\Message;
 
+use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
-use Illuminate\Broadcasting\PresenceChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
@@ -24,7 +24,7 @@ class MessageSent implements ShouldBroadcast
     public function broadcastOn(): array
     {
         return [
-            new PresenceChannel('group.' . $this->message->group_id),
+            new Channel('group.' . $this->message->group_id),
         ];
     }
 
@@ -44,6 +44,7 @@ class MessageSent implements ShouldBroadcast
                 'content' => $this->message->content,
                 'created_at' => $this->message->created_at,
                 'group_id' => $this->message->group_id,
+                'sender_id' => $this->message->sender_id,
             ],
         ];
     }

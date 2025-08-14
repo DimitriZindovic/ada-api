@@ -8,8 +8,6 @@ use Illuminate\Support\Facades\Event;
 beforeEach(function () {
     $this->user = User::first();
     $this->actingAs($this->user);
-
-    // Désactiver les événements de broadcasting pendant les tests
     Event::fake();
 });
 
